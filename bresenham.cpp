@@ -99,8 +99,7 @@ void drawLine_2(int x0, int y0, int x1, int y1){
     }
 }
 void drawLine_3(int x0, int y0, int x1, int y1){
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3i(0,1,1);
+
     int x, y, d, dx, dy, dW, dNW;
     dx = x1 - x0, dy = y1 - y0;
     d = -2*dy-dx;
@@ -122,8 +121,6 @@ void drawLine_3(int x0, int y0, int x1, int y1){
 }
 
 void drawLine_4(int x0, int y0, int x1, int y1){
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3d(1,1,1);
     int x, y, d, dx, dy, dW, dWS;
     dx = x1 - x0, dy = y1 - y0;
     d = -2*dy+dx;
@@ -144,8 +141,6 @@ void drawLine_4(int x0, int y0, int x1, int y1){
     }
 }
 void drawLine_5(int x0, int y0, int x1, int y1){
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3f(1,0.5,0);
     int x, y, d, dx, dy, dS, dWS;
     dx = x1 - x0, dy = y1 - y0;
     d = -dy+2*dx;
@@ -167,8 +162,6 @@ void drawLine_5(int x0, int y0, int x1, int y1){
 }
 
 void drawLine_6(int x0, int y0, int x1, int y1){
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3d(.5,1,0);
     int x, y, d, dS, dSE, dx, dy;
     dx = x1-x0, dy = y1-y0;
     d = dy - 2*dx;
