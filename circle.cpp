@@ -27,6 +27,7 @@ static int slices = 16;
 static int stacks = 16;
 int x=200, y=100;
 int r = 30;
+int flag = 0;
 
 struct Center{
     int  x = 30, y = 40;
@@ -52,7 +53,7 @@ struct Velocity{
         y_dir = -y_dir;
     }
     void print(){
-        printf("%f %f\n", x_dir, y_dir);
+        printf("%d %d\n", x_dir, y_dir);
     }
     void add(struct Velocity velocity2){
         x_dir += velocity2.x_dir;
@@ -175,6 +176,24 @@ void timer(int a){
     glutTimerFunc(1000/40,timer,0);
 
 }
+static void mouse(int button, int state, int mousex, int mousey)
+{
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
+    {
+        if (flag== 0) 
+        {
+            int _x0 = mousex - 320;
+            int _y0 = 240 - mousey;
+            flag = 1;
+            circle1.init(_x0,_y0,40,-1, -1);
+        } else if (flag == 1) {
+            int _x1 = mousex - 320;
+            int _y1 = 240 - mousey;
+            flag = 2;
+            circle2.init(_x1, _y1, 40, 1, 0);
+        }
+    }
+}
 
 
 
@@ -187,82 +206,6 @@ static void resize(int width, int height){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity() ;
 }
-
-
-
-void draw8way(struct Center center_trans, struct Center center){
-        glVertex2i(center_trans.x + center.x,  center_trans.y + center.y);
-
-        glVertex2i(center_trans.y + center.x, center_trans.x + center.y);
-
-        glVertex2i(-center_trans.y + center.x, center_trans.x + center.y);
-
-        glVertex2i(-center_trans.x + center.x, center_trans.y + center.y);
-
-        glVertex2i(-center_trans.x + center.x, -center_trans.y + center.y);
-
-        glVertex2i(-center_trans.y + center.x, -center_trans.x + center.y);
-
-        glVertex2i(center_trans.y + center.x, -center_trans.x + center.y);
-
-        glVertex2i(center_trans.x + center.x, -center_trans.y + center.y);
-
-}
-
-void drawCircle_1(struct Center center,int r){
-    Center center_trans;
-    center_trans.x = r;
-    center_trans.y = 0;
-    int d = 5 - 4*r;
-    draw8way(center_trans,center);
-    while(center_trans.x < center_trans.y){
-        if( d<0 ){
-            d += 8*center_trans.x+12;
-            center_trans.x++;
-        }
-        else{
-            d += 8*center_trans.x-8*center_trans.y+20;
-            center_trans.x++;
-            center_trans.y--;
-        }
-        draw8way(center_trans, center);
-    }
-}
-
-void drawCircle_2(struct Center center,int r){
-    Center center_trans;
-    center_trans.x = r, center_trans.y = 0;
-    int d = 5 - 4*r;
-    draw8way(center_trans,center);
-    while(center_trans.y<center_trans.x){
-        if(d<0){
-            d+=8*center_trans.y+12;
-            center_trans.y++;
-        }
-        else{
-            d += 8*center_trans.y-8*center_trans.x+20;
-            center_trans.x--;
-            center_trans.y++;
-        }
-        draw8way(center_trans,center);
-    }
-}
-
-
-void actionXboundary(){
-    if(center.x + r >= 319 || center.x-r <= -320)
-        velocity.negateX();
-}
-void actionYboundary(){
-    if(center.y+r>=239 || center.y-r<=-240)
-    velocity.negateY();
-}
-
-void updateCenter(){
-    center.x += velocity.x_dir;
-    center.y += velocity.y_dir;
-}
-
 
 
 
@@ -279,21 +222,25 @@ static void display(void){
     
 
     
+    if(flag==2){
+        glBegin(GL_POINTS);
+        circle1.drawCircle_2();
+        circle2.drawCircle_2();
+        glEnd();
+        glutSwapBuffers();
+        circle1.actionXboundary();
+        circle1.actionYboundary();
+        circle1.actionCollide(circle2);
+        circle1.updateCenter();
 
-    glBegin(GL_POINTS);
-    circle1.drawCircle_2();
-    circle2.drawCircle_2();
-    glEnd();
-    glutSwapBuffers();
-    circle1.actionXboundary();
-    circle1.actionYboundary();
-    circle1.actionCollide(circle2);
-    circle1.updateCenter();
-
-    circle2.actionXboundary();
-    circle2.actionYboundary();
-    circle2.actionCollide(circle1);
-    circle2.updateCenter();
+        circle2.actionXboundary();
+        circle2.actionYboundary();
+        circle2.actionCollide(circle1);
+        circle2.updateCenter();
+    }
+    else{
+        glutSwapBuffers();
+    }
 }
 
 
@@ -345,6 +292,7 @@ int main(int argc, char *argv[]){
     glutKeyboardFunc(key);
     glutIdleFunc(idle);
     glutTimerFunc(1000,timer, 0);
+    glutMouseFunc(mouse);
 
     glutMainLoop();
 
