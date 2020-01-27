@@ -25,22 +25,23 @@
 
 static int slices = 16;
 static int stacks = 16;
-int x=200, y=100;
-int r = 30;
-int flag = 0;
+double x=200, y=100;
+double r = 30;
+double flag = 0;
 
 struct Center{
-    int  x = 30, y = 40;
-    void init(int x_, int y_){
+    double  x = 30, y = 40;
+    void init(double x_, double y_){
         x = x_;
         y = y_;
     }
 };
 struct Velocity{
-    int x_dir = -1, y_dir = -1;
-    void init(int x_dir_, int y_dir_){
+    double x_dir = -1, y_dir = -1;
+    void init(double x_dir_, double y_dir_){
         x_dir = x_dir_;
         y_dir = y_dir_;
+        //printf("%f %f\n", x_dir, y_dir);
     }
     void negate(){
         x_dir = -x_dir;
@@ -53,7 +54,7 @@ struct Velocity{
         y_dir = -y_dir;
     }
     void print(){
-        printf("%d %d\n", x_dir, y_dir);
+        //printf("%f %f\n", x_dir, y_dir);
     }
     void add(struct Velocity velocity2){
         x_dir += velocity2.x_dir;
@@ -64,19 +65,17 @@ struct Velocity{
         struct Velocity rtn;
         return div;
     }
-    struct Velocity norm(){
+    void norm(){
         double div = sqrt(x_dir*x_dir + y_dir*y_dir);
-        struct Velocity rtn;
-        rtn.init(x_dir/div, y_dir/div);
-        return rtn;
+        x_dir = x_dir/div; y_dir = y_dir/div;
     }
 
 };
 struct Circle{
     Center center;
-    int r = 40;
+    double r = 40;
     Velocity velocity;
-    void init(int x,int y,int r_,int x_dir, int y_dir){
+    void init(double x,double y,double r_,double x_dir, double y_dir){
         center.init(x,y);
         r = r_;
         velocity.init(x_dir, y_dir);
@@ -104,7 +103,7 @@ struct Circle{
         Center point;
         point.x = 0;
         point.y = r;
-        int d = 5 - 4*r;
+        double d = 5 - 4*r;
         draw8way(point);
         while(point.x < point.y){
             if( d<0 ){
@@ -123,7 +122,7 @@ struct Circle{
     void drawCircle_2(){
         Center point;
         point.x = r, point.y = 0;
-        int d = 5 - 4*r;
+        double d = 5 - 4*r;
         draw8way(point);
         while(point.y<point.x){
             if(d<0){
@@ -149,7 +148,7 @@ struct Circle{
     void actionCollide(Circle circle2){
         if( sqrt((center.x-circle2.center.x)*(center.x-circle2.center.x) 
             +
-            (center.y-circle2.center.y)*(center.y-circle2.center.y)) <= 2*r ){
+            (center.y-circle2.center.y)*(center.y-circle2.center.y)) <= r+circle2.r ){
 
                 velocity.negate();
 
@@ -176,22 +175,38 @@ void timer(int a){
     glutTimerFunc(1000/40,timer,0);
 
 }
+    double _x0, _y0, _x1, _y1;
+
 static void mouse(int button, int state, int mousex, int mousey)
 {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
-    {
-        if (flag== 0) 
-        {
-            int _x0 = mousex - 320;
-            int _y0 = 240 - mousey;
-            flag = 1;
-            circle1.init(_x0,_y0,40,-1, -1);
-        } else if (flag == 1) {
-            int _x1 = mousex - 320;
-            int _y1 = 240 - mousey;
-            flag = 2;
-            circle2.init(_x1, _y1, 40, 1, 0);
-        }
+    
+    if (flag == 0 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+        _x0 = mousex - 320;
+        _y0 = 240 - mousey;
+        flag = 1;
+    }
+    if (flag == 1 && button == GLUT_LEFT_BUTTON && state == GLUT_UP){
+        _x1 = mousex - 320;
+        _y1 = 240 - mousey;
+        double dir_x = (_x1-_x0), dir_y = (_y1- _y0);
+        double r = sqrt((_x0-_x1)*(_x0-_x1) + (_y0-_y1)*(_y0-_y1));
+        
+        circle1.init(_x0, _y0, r, dir_x/r,dir_y/r);
+        flag = 2;
+    }
+    if (flag == 2 && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+        _x0 = mousex - 320;
+        _y0 = 240 - mousey;
+        flag = 3;
+    }
+    if (flag == 3 && button == GLUT_LEFT_BUTTON && state == GLUT_UP){
+        _x1 = mousex - 320;
+        _y1 = 240 - mousey;
+        double dir_x = (_x1-_x0), dir_y = (_y1- _y0);
+        double r = sqrt((_x0-_x1)*(_x0-_x1) + (_y0-_y1)*(_y0-_y1));
+        
+        circle2.init(_x0, _y0, r, dir_x/r,dir_y/r);
+        flag = 4;
     }
 }
 
@@ -225,6 +240,21 @@ static void display(void){
     if(flag==2){
         glBegin(GL_POINTS);
         circle1.drawCircle_2();
+        //circle2.drawCircle_2();
+        glEnd();
+        glutSwapBuffers();
+        circle1.actionXboundary();
+        circle1.actionYboundary();
+        //circle1.actionCollide(circle2);
+        circle1.updateCenter();
+        //circle2.actionXboundary();
+        //circle2.actionYboundary();
+        //circle2.actionCollide(circle1);
+        //circle2.updateCenter();
+    }
+    else if(flag==4){
+        glBegin(GL_POINTS);
+        circle1.drawCircle_2();
         circle2.drawCircle_2();
         glEnd();
         glutSwapBuffers();
@@ -232,7 +262,6 @@ static void display(void){
         circle1.actionYboundary();
         circle1.actionCollide(circle2);
         circle1.updateCenter();
-
         circle2.actionXboundary();
         circle2.actionYboundary();
         circle2.actionCollide(circle1);
@@ -291,7 +320,7 @@ int main(int argc, char *argv[]){
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
     glutIdleFunc(idle);
-    //glutTimerFunc(1000,timer, 0);
+    glutTimerFunc(1000,timer, 0);
     glutMouseFunc(mouse);
 
     glutMainLoop();
