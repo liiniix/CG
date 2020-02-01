@@ -320,7 +320,7 @@ int main(int argc, char *argv[]){
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
     glutIdleFunc(idle);
-    glutTimerFunc(1000,timer, 0);
+    //glutTimerFunc(1000,timer, 0);
     glutMouseFunc(mouse);
 
     glutMainLoop();
