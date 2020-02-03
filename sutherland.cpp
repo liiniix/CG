@@ -23,7 +23,7 @@
 
 static int slices = 16;
 static int stacks = 16;
-int status, flag;
+int status, flag=0;
 int _x0, _y0, _x1, _y1;
 int TOP = 8, BOTTOM = 4, RIGHT = 2, LEFT = 1;
 int xmax = 120, xmin = -120, ymax = 100, ymin = -100;
@@ -43,7 +43,7 @@ static void mouse(int button, int state, int mousex, int mousey)
             _x1 = mousex - 320;
             _y1 = 240 - mousey;
             status = 1;
-            flag = 1;
+            flag = 0;
         }
     }
 }
@@ -91,6 +91,7 @@ void draw8way(int x, int y, int zone){
 }
 
 void drawLine_0(int x0, int y0, int x1, int y1, int zone){
+    glBegin(GL_POINTS);
     int x, y, d, dx, dy, dE, dNE;
     dx = x1-x0;
     dy = y1-y0;
@@ -109,6 +110,7 @@ void drawLine_0(int x0, int y0, int x1, int y1, int zone){
         }
         draw8way(x,y,zone);
     }
+    glEnd();
 }
 
 
@@ -118,41 +120,41 @@ void findZone(int x0, int y0, int x1, int y1){
     dy = y1-y0;
     if(dx>=0 and dy>=0){
         if(dx>dy){
-            glColor3f(1.0, 0.0, 0.0);
+            //glColor3f(1.0, 0.0, 0.0);
             drawLine_0(x0,y0,x1,y1,0);
         }
         else{
-            glColor3f(0.0, 1.0, 0.0);
+            //glColor3f(0.0, 1.0, 0.0);
             drawLine_0(y0,x0,y1,x1,1);
         }
     }
     else if(dx<=0 and dy>=0){
         if(abs(dx) > dy){
-            glColor3f(0.0, 0.0, 1.0);
+            //glColor3f(0.0, 0.0, 1.0);
             drawLine_0(-x0,y0,-x1,y1,3);
         }
         else{
-            glColor3f(0.0, 0.0, 1.0);
+            //glColor3f(0.0, 0.0, 1.0);
             drawLine_0(y0,-x0,y1,-x1,2);
         }
     }
     else if(dx<=0 and dy<=0){
         if(abs(dx)>abs(dy)){
-            glColor3f(1.0, 1.0, 1.0);
+            //glColor3f(1.0, 1.0, 1.0);
             drawLine_0(-x0,-y0,-x1,-y1,4);
         }
         else{
-            glColor3f(1.0, 0.0, 1.0);
+            //glColor3f(1.0, 0.0, 1.0);
             drawLine_0(-y0,-x0,-y1,-x1,5);
         }
     }
     else if(dx>=0 and dy<=0){
         if(dx>abs(dy)){
-            glColor3f(0.0, 1.0, 1.0);
+            //glColor3f(0.0, 1.0, 1.0);
             drawLine_0(x0,-y0,x1,-y1,7);
         }
         else{
-            glColor3f(1.0, 1.0, 0.0);
+            //glColor3f(1.0, 1.0, 0.0);
             drawLine_0(-y0,x0,-y1,x1,6);
         }
     }
@@ -171,20 +173,30 @@ int makeCode(int x, int y){
     
 }
 
+
 void CohenSutherland(int x0, int y0, int x1, int y1){
+    int t=0;
+    glColor3f(1.0f, 1.0f, 1.0f);
     int Code0, Code1, Code;
     int x, y;
     Code0 = makeCode(x0, y0);
     Code1 = makeCode(x1, y1);
     while(1){
         if(!(Code0|Code1)){
+            if(t==1 && flag ==0)
+            printf("Partially accepted\n"),flag=1;
+            else if(t!=1 && flag ==0)printf("Complete accepted\n"), flag=1;
+            glPointSize(3);
             findZone(x0, y0, x1, y1);
             break;
         }
         else if(Code0 & Code1){
+            if(flag==0)printf("Completely rejected\n"),flag=1;
             break;
         }
         else{
+            t = 1;
+            //drawInter(x0, y0, x1, y1);
             if(Code0)Code=Code0;
             else Code = Code1;
             if(Code&TOP){
@@ -204,11 +216,19 @@ void CohenSutherland(int x0, int y0, int x1, int y1){
                 y = y0 + (xmin-x0)*(y1-y0)/(x1-x0);
             }
             if(Code == Code0){
+                glPointSize(5);
                 x0 = x; y0 = y;
+                glBegin(GL_POINTS);
+                glVertex2i(x0,y0);
+                glEnd();
                 Code0 = makeCode(x0, y0);
             }
             else{
+                glPointSize(5);
                 x1 = x; y1=y;
+                glBegin(GL_POINTS);
+                glVertex2i(x1,y1);
+                glEnd();
                 Code1 = makeCode(x1,y1);
             }
         }
@@ -221,28 +241,42 @@ static void display(void){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3d(1,1,1);
     glBegin(GL_LINES);
-    glVertex2i(-320, 0);
-    glVertex2i(319, 0);
-    glVertex2i(0, -240);
-    glVertex2i(0, 239);
-    glVertex2i(xmax,ymax);
-    glVertex2i(xmax,ymin);
-    glVertex2i(xmin,ymax);
-    glVertex2i(xmin,ymin);
-    glVertex2i(xmax,ymax);
-    glVertex2i(xmin,ymax);
-    glVertex2i(xmax,ymin);
-    glVertex2i(xmin,ymin);
+    //glVertex2i(-320, 0);
+    //glVertex2i(319, 0);
+    //glVertex2i(0, -240);
+    //glVertex2i(0, 239);
+    //glVertex2i(xmax,ymax);
+    //glVertex2i(xmax,ymin);
+    //glVertex2i(xmin,ymax);
+    //glVertex2i(xmin,ymin);
+    //glVertex2i(xmax,ymax);
+    //glVertex2i(xmin,ymax);
+    //glVertex2i(xmax,ymin);
+    //glVertex2i(xmin,ymin);
+    glVertex2i(-320, ymax);
+    glVertex2i(319,ymax);
+    glVertex2i(-320, ymin);
+    glVertex2i(319,ymin);
+    glVertex2i(xmin, 239);
+    glVertex2i(xmin, -320);
+    glVertex2i(xmax, 239);
+    glVertex2i(xmax, -320);
     glEnd();
     if(status==1){
-        glPointSize(3);
-        glBegin(GL_POINTS);
-        CohenSutherland(_x0, _y0, _x1, _y1);
-        glEnd();
+        glColor4f(1.0f, 0.0f, 0.0f, 0.0f);//red
         glPointSize(1);
-        glBegin(GL_POINTS);
         findZone(_x0, _y0, _x1, _y1);
+
+
+
+        CohenSutherland(_x0, _y0, _x1, _y1);
+
+        glPointSize(5);
+        glBegin(GL_POINTS);
+        glVertex2i(_x0,_y0);
+        glVertex2i(_x1,_y1);
         glEnd();
+        
     }
     glutSwapBuffers();
 }
