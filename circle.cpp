@@ -83,19 +83,12 @@ struct Circle{
     }
     void draw8way(struct Center point){
             glVertex2i(point.x + center.x,  point.y + center.y);
-
             glVertex2i(point.y + center.x, point.x + center.y);
-
             glVertex2i(-point.y + center.x, point.x + center.y);
-
             glVertex2i(-point.x + center.x, point.y + center.y);
-
             glVertex2i(-point.x + center.x, -point.y + center.y);
-
             glVertex2i(-point.y + center.x, -point.x + center.y);
-
             glVertex2i(point.y + center.x, -point.x + center.y);
-
             glVertex2i(point.x + center.x, -point.y + center.y);
 
     }
