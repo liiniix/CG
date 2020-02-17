@@ -29,17 +29,18 @@ static int stacks = 16;
 double x=200, y=100;
 double r = 30;
 double flag = 0;
+int i = 0, up = 0, left = 1;
 static void display();
 
 struct Center{
-    double  x = 30, y = 30;
+    double  x = 0, y = 0;
     void init(double x_, double y_){
         x = x_;
         y = y_;
     }
 };
 struct Velocity{
-    double x_dir = -1, y_dir = -1;
+    double x_dir = 0, y_dir = -0;
     void init(double x_dir_, double y_dir_){
         x_dir = x_dir_;
         y_dir = y_dir_;
@@ -74,7 +75,7 @@ struct Velocity{
 
 };
 struct Acceleration{
-    double x_dir = 0, y_dir = 1;
+    double x_dir = -.02, y_dir = -0.02;
     void init(double x_dir_, double y_dir_){
         x_dir = x_dir_;
         y_dir = y_dir_;
@@ -198,17 +199,21 @@ struct Ellipse{
     //}
 
     void updateCenter(){
-        center.x += velocity.x_dir;
+        //center.x += velocity.x_dir;
         center.y += velocity.y_dir;
         velocity.x_dir += accel.x_dir;
         velocity.y_dir += accel.y_dir;
+        printf("%f\n", accel.y_dir);
+        if(velocity.y_dir<0)up = 0;
+        else up = 1;
+        
     }
 };
 struct Ellipse Ellipse1, Ellipse2, Ellipse3;
 struct Center center;
 struct Velocity velocity;
 void init(){
-    Ellipse1.init(0, 0, 70, 70, 0, 0);
+    Ellipse1.init(0, 0, 80, 80, 0, 0);
     printf("ellispe");
     Ellipse2 = Ellipse1;
     Ellipse3 = Ellipse1;
@@ -234,9 +239,6 @@ static void resize(int width, int height){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity() ;
 }
-
-
-
 void drawAxis(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3d(1,1,1);
@@ -248,37 +250,41 @@ void drawAxis(){
     glEnd();
 }
 int fly = 1;
-int i = 0, up = 1;
+
 int p=0, q=0;
 
 int a = 80, b = 80;
+int cx, cy;
 void kicu(){
     Ellipse3.center = Ellipse1.center;
-    if(p<4){
+    if(p<11 && !up){
         
-        Ellipse3.a += Ellipse3.a*.05;
-        Ellipse3.b -= Ellipse3.b*.05;
+        Ellipse1.a += Ellipse1.a*.02;
+        Ellipse1.b -= Ellipse1.b*.02;
+        Ellipse1.center.y-=1;
             glBegin(GL_POINTS);
-            Ellipse3.drawEllipse_1();
+            Ellipse1.drawEllipse_1();
             glEnd();
             p++;
     }
-    else if(q<4){
-        Ellipse3.a += Ellipse3.a*.05;
-        Ellipse3.b -= Ellipse3.b*.05;
+    else if(q<11 && !up){
+        Ellipse1.a -= Ellipse1.a*.02;
+        Ellipse1.b += Ellipse1.b*.02;
+        Ellipse1.center.y+=2;
             glBegin(GL_POINTS);
-            Ellipse3.drawEllipse_1();
+            Ellipse1.drawEllipse_1();
             glEnd();
             q++;
     }
     else{
         p = q = 0;
         fly = 1;
-        Ellipse1.velocity.init(0,0);
-        Ellipse1.accel.negate();
+        Ellipse1.velocity.negateY();
+        //Ellipse1.accel.negateY();
+        Ellipse1.updateCenter();
         if(up)up = 0;
         else up = 1;
-        Ellipse3 = Ellipse1;
+        //Ellipse1 = Ellipse3;
     }
 }
 static void display(void){
@@ -286,6 +292,8 @@ static void display(void){
     double a = Ellipse1.a, b = Ellipse1.b;
     if(fly && (Ellipse1.center.y-b<=-240 && !up) || (Ellipse1.center.y+b>239 && up)){
         fly = 0;
+        cx = Ellipse1.center.x;
+        cy = Ellipse1.center.y;
     }
     if(fly){
         glBegin(GL_POINTS);
@@ -298,6 +306,11 @@ static void display(void){
     }
     else{
         kicu();
+    }
+    if((Ellipse1.center.x-80<=-320) || (Ellipse1.center.x+80>=319)){
+        //Ellipse1.velocity.negateX();
+        //Ellipse1.accel.negateX();
+        Ellipse1.updateCenter();
     }
     glutSwapBuffers();
 }
