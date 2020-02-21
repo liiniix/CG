@@ -18,8 +18,8 @@
 #include <GL/glut.h>
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
 
 static int slices = 16;
 static int stacks = 16;
@@ -33,8 +33,25 @@ struct Vector{
         x = x1-x0;
         y = y1-y0;
     }
+    double dot(struct Vector an)
+    {
+        double rtn = 0;
+        rtn = an.x * x + an.y * y;
+        return rtn;
+    }
     
 };
+
+struct Vector fl, fr, fd, fu, nl, nr, nd, nu;
+void init(){
+    fl.init(xmin, ymin, 0, 0);fd = fl;
+    fr.init(xmax, ymax, 0, 0);fu = fr;
+    nl.init(-1, 0 , 0, 0);
+    nr.init(1, 0, 0, 0);
+    nd.init(0, -1, 0, 0);
+    nu.init(0,1, 0 , 0);
+
+}
 
 
 static void mouse(int button, int state, int mousex, int mousey)
@@ -242,6 +259,54 @@ void CohenSutherland(int x0, int y0, int x1, int y1){
     }
 }
 
+void cyrus(struct Vector P1, struct Vector P2){
+    double tlmin=0, tlmax = 1;
+    struct Vector D;
+    D.init(P2.x, P2.y, P1.x, P1.y);
+    struct Vector W;
+    W.init(P1.x, P1.y, fl.x, fl.y);
+    
+    if(D.dot(nl)<0){
+        tlmin = max(tlmin, -W.dot(nl)/D.dot(nl));
+    }
+    else{
+        tlmax = min(tlmax, -W.dot(nl)/D.dot(nl));
+    }
+    W.init(P1.x, P1.y, fr.x, fr.y);
+    if(D.dot(nr)<0){
+        tlmin = max(tlmin, -W.dot(nr)/D.dot(nr));
+    }
+    else{
+        tlmax = min(tlmax, -W.dot(nr)/D.dot(nr));
+    }
+
+    W.init(P1.x, P1.y, fu.x, fu.y);
+    if(D.dot(nu)<0){
+        tlmin = max(tlmin, -W.dot(nu)/D.dot(nu));
+    }
+    else{
+        tlmax = min(tlmax, -W.dot(nu)/D.dot(nu));
+    }
+
+    W.init(P1.x, P1.y, fd.x, fd.y);
+    if(D.dot(nd)<0){
+        tlmin = max(tlmin, -W.dot(nd)/D.dot(nd));
+    }
+    else{
+        tlmax = min(tlmax, -W.dot(nd)/D.dot(nd));
+    }
+    double x1 = P1.x + (P2.x - P1.x)*tlmin;
+    double y1 = P1.y + (P2.y - P1.y)*tlmin;
+    double x2 = P1.x + (P2.x - P1.x)*tlmax;
+    double y2 = P1.y + (P2.y - P1.y)*tlmax;
+    glPointSize(10);
+    glColor3f(1,1,1);
+    glBegin(GL_POINTS);
+    glVertex2i(x1, y1);
+    glVertex2i(x2,y2);
+    glEnd();
+}
+
 
 
 static void display(void){
@@ -277,14 +342,18 @@ static void display(void){
 
 
 
-        CohenSutherland(_x0, _y0, _x1, _y1);
+        //CohenSutherland(_x0, _y0, _x1, _y1);
 
-        glPointSize(5);
-        glBegin(GL_POINTS);
-        glVertex2i(_x0,_y0);
-        glVertex2i(_x1,_y1);
-        glEnd();
-        
+        //glPointSize(5);
+        //glBegin(GL_POINTS);
+        //glVertex2i(_x0,_y0);
+        //glVertex2i(_x1,_y1);
+        //glEnd();
+
+        struct Vector P1, P2;
+        P1.init(_x0, _y0, 0, 0);
+        P2.init(_x1, _y1, 0, 0);
+        cyrus(P1, P2);        
     }
     glutSwapBuffers();
 }
@@ -326,7 +395,7 @@ static void idle(void)
 int main(int argc, char *argv[]){
     status = -1;
     flag = 1;
-
+    init();
     glutInit(&argc, argv);
     glutInitWindowSize(640,480);
     glutInitWindowPosition(10,10);

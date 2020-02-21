@@ -18,8 +18,8 @@
 #include <GL/glut.h>
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
 
 static int slices = 16;
 static int stacks = 16;
@@ -27,14 +27,8 @@ int status, flag=0;
 int _x0, _y0, _x1, _y1;
 int TOP = 8, BOTTOM = 4, RIGHT = 2, LEFT = 1;
 int xmax = 120, xmin = -120, ymax = 100, ymin = -100;
-struct Vector{
-    double x, y;
-    void init(double x1, double y1, double x0, double y0){
-        x = x1-x0;
-        y = y1-y0;
-    }
-    
-};
+
+
 
 
 static void mouse(int button, int state, int mousex, int mousey)
@@ -242,6 +236,50 @@ void CohenSutherland(int x0, int y0, int x1, int y1){
     }
 }
 
+void cyrus(double x1, double y1, double x2, double y2){
+    double temax = 0, tlmin = 1;
+    double t = -(x1-xmin)/(x2-x1);
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    glVertex2i(x1 + (x2-x1)*t, y1 + (y2-y1)*t);
+    glEnd();
+    if(-(x2-x1)<0) temax = max(temax, t);
+    else tlmin = min(tlmin, t);
+
+    t = -(x1-xmax)/(x2-x1);
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    glVertex2i(x1 + (x2-x1)*t, y1 + (y2-y1)*t);
+    glEnd();
+    if(x2-x1<0) temax = max(temax, t);
+    else tlmin = min(tlmin, t);
+
+    t = -(y1-ymax)/(y2-y1);
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    glVertex2i(x1 + (x2-x1)*t, y1 + (y2-y1)*t);
+    glEnd();
+    if(y2-y1<0) temax = max(temax, t);
+    else tlmin = min(tlmin, t);
+
+    t = -(y1-ymin)/(y2-y1);
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    glVertex2i(x1 + (x2-x1)*t, y1 + (y2-y1)*t);
+    glEnd();
+    if(-(y2-y1)<0) temax = max(temax, t);
+    else tlmin = min(tlmin, t);
+
+    if(temax<tlmin){
+        int x1_ = x1 + (x2-x1)*temax;
+        int y1_ = y1 + (y2-y1)*temax;
+        int x2_ = x1 + (x2-x1)*tlmin;
+        int y2_ = y1 + (y2-y1)*tlmin;
+        glPointSize(3);
+        findZone(x1_, y1_, x2_, y2_);
+    }
+}
+
 
 
 static void display(void){
@@ -271,20 +309,11 @@ static void display(void){
     glVertex2i(xmax, -320);
     glEnd();
     if(status==1){
-        glColor4f(1.0f, 0.0f, 0.0f, 0.0f);//red
+        //glColor4f(1.0f, 0.0f, 0.0f, 0.0f);//red
         glPointSize(1);
         findZone(_x0, _y0, _x1, _y1);
-
-
-
-        CohenSutherland(_x0, _y0, _x1, _y1);
-
-        glPointSize(5);
-        glBegin(GL_POINTS);
-        glVertex2i(_x0,_y0);
-        glVertex2i(_x1,_y1);
-        glEnd();
-        
+        //glPointSize(3);
+        cyrus(_x0, _y0, _x1, _y1);
     }
     glutSwapBuffers();
 }
@@ -326,7 +355,6 @@ static void idle(void)
 int main(int argc, char *argv[]){
     status = -1;
     flag = 1;
-
     glutInit(&argc, argv);
     glutInitWindowSize(640,480);
     glutInitWindowPosition(10,10);
