@@ -235,9 +235,9 @@ void CohenSutherland(int x0, int y0, int x1, int y1){
         }
     }
 }
-
+double temax = 0, tlmin = 1;
 void cyrus(double x1, double y1, double x2, double y2){
-    double temax = 0, tlmin = 1;
+    temax = 0, tlmin = 1;
     double t = -(x1-xmin)/(x2-x1);
     glPointSize(5);
     glBegin(GL_POINTS);
@@ -311,9 +311,21 @@ static void display(void){
     if(status==1){
         //glColor4f(1.0f, 0.0f, 0.0f, 0.0f);//red
         glPointSize(1);
+        glColor3f(1,1,1);
         findZone(_x0, _y0, _x1, _y1);
         //glPointSize(3);
+        glColor3f(1,1,0);
         cyrus(_x0, _y0, _x1, _y1);
+        if(flag==0){
+            if(temax>tlmin)
+                printf("Fully rejected\n");
+            else if(temax>0 || tlmin<1)
+                printf("Partially accepted\n");
+            else
+                printf("Fully accepted\n");
+            
+            flag = 1;
+        }
     }
     glutSwapBuffers();
 }
