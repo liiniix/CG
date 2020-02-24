@@ -236,6 +236,7 @@ void CohenSutherland(int x0, int y0, int x1, int y1){
     }
 }
 double temax = 0, tlmin = 1;
+int x1_, x2_, y1_, y2_;
 void cyrus(double x1, double y1, double x2, double y2){
     temax = 0, tlmin = 1;
     double t = -(x1-xmin)/(x2-x1);
@@ -271,16 +272,19 @@ void cyrus(double x1, double y1, double x2, double y2){
     else tlmin = min(tlmin, t);
 
     if(temax<tlmin){
-        int x1_ = x1 + (x2-x1)*temax;
-        int y1_ = y1 + (y2-y1)*temax;
-        int x2_ = x1 + (x2-x1)*tlmin;
-        int y2_ = y1 + (y2-y1)*tlmin;
+        x1_ = x1 + (x2-x1)*temax;
+        y1_ = y1 + (y2-y1)*temax;
+        x2_ = x1 + (x2-x1)*tlmin;
+        y2_ = y1 + (y2-y1)*tlmin;
         glPointSize(3);
         findZone(x1_, y1_, x2_, y2_);
     }
 }
 
-
+int f(int x1, int y1,int x2,int y2, int a, int b){
+    int retn = (x2-x1)*(b-y2) - (a-x2)*(y2-y1);
+    return retn;
+}
 
 static void display(void){
     int x = 200, y = 100;
@@ -316,17 +320,87 @@ static void display(void){
         //glPointSize(3);
         glColor3f(1,1,0);
         cyrus(_x0, _y0, _x1, _y1);
-        if(flag==0){
-            if(temax>tlmin)
-                printf("Fully rejected\n");
-            else if(temax>0 || tlmin<1)
-                printf("Partially accepted\n");
-            else
-                printf("Fully accepted\n");
-            
-            flag = 1;
+        //if(flag==0){
+        //    if(temax>tlmin)
+        //        printf("Fully rejected\n");
+        //    else if(temax>0 || tlmin<1)
+        //        printf("Partially accepted\n");
+        //    else
+        //        printf("Fully accepted\n");
+        //    
+        //    flag = 1;
+        //}
+        vector<int> a, b;
+        if(f(x1_, y1_, x2_, y2_, xmin, ymin)<0){
+            if(flag==0)printf("polygon1: %d %d\n", xmin, ymin);
+            a.push_back(xmin);
+            a.push_back(ymin);
         }
+        else
+        {
+            if(flag==0)printf("polygon2: %d %d\n", xmin, ymin);
+            b.push_back(xmin);
+            b.push_back(ymin);
+        }
+        
+        if(f(x1_, y1_, x2_, y2_, xmin, ymax)<0){
+            if(flag==0)printf("polygon1: %d %d\n", xmin, ymax);
+            a.push_back(xmin);
+            a.push_back(ymax);
+        }
+        else
+        {
+            if(flag==0)printf("polygon2: %d %d\n", xmin, ymax);
+            b.push_back(xmin);
+            b.push_back(ymax);
+        }
+        if(f(x1_, y1_, x2_, y2_, xmax, ymax)<0){
+            if(flag==0)printf("polygon1: %d %d\n", xmax, ymax);
+            a.push_back(xmax);
+            a.push_back(ymax);
+        }
+        else
+        {
+            if(flag==0)printf("polygon2: %d %d\n", xmax, ymax);
+            b.push_back(xmax);
+            b.push_back(ymax);
+        }
+        if(f(x1_, y1_, x2_, y2_, xmax, ymin)<0){
+            if(flag==0)printf("polygon1: %d %d\n", xmax, ymin);
+            a.push_back(xmax);
+            a.push_back(ymin);
+        }
+        else
+        {
+            if(flag==0)printf("polygon2: %d %d\n", xmax, ymin);
+            b.push_back(xmax);
+            b.push_back(ymin);
+        }
+        if(flag==0)
+            printf("###\n");
+        for(int i=0;i<a.size();++i)
+            if(flag==0){
+                if(i%2==0)printf("(");
+                printf(" %d ", a[i]);
+                if(i%2!=0)
+                    printf(")\n");
+            }
+        if(flag==0)printf("(%d %d)\n(%d %d)\n", x1_, y1_, x2_, y2_);
+        if(flag==0)
+            printf("###\n");
+        for(int i=0;i<b.size();++i)
+            if(flag==0){
+                if(i%2==0)printf("(");
+                printf(" %d ", b[i]);
+                if(i%2!=0)
+                    printf(")\n");
+            }
+        if(flag==0)printf("(%d %d)\n(%d %d)\n", x1_, y1_, x2_, y2_);
+        if(flag==0)
+            printf("###\n");
+        flag = 1;
     }
+    
     glutSwapBuffers();
 }
 
