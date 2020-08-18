@@ -83,7 +83,7 @@ static void display(void){
                         double Nx=x1-a1,Ny=y1-b1,Nz=z1-c1;
                         double un = sqrt(Nx*Nx+Ny*Ny+Nz*Nz);
                         Nx/=un, Ny/=un,Nz/=un;
-                        color[x1+320][y1+240][0]=30+.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),10));
+                        color[x1+320][y1+240][0]=35+.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),10));
                         //color[x1+320][y1+240][1]=.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),100));
                         //color[x1+320][y1+240][2]=.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),100));
                     }
