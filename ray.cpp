@@ -26,7 +26,7 @@ static int slices = 16;
 static int stacks = 16;
 double _x0 = 0, _y0 = 0, _z0 = 500;
 double color[650][490][3];
-double a1=100,b1 =0, c1 =100, r1 = 50, a2 = 0, b2 = 0, c2 = 80, r2 = 60;
+double a1=50,b1 =30, c1 =80, r1 = 70, a2 = 100, b2 = 0, c2 = 80, r2 = 50;
 
 /* GLUT callback Handlers */
 
@@ -60,7 +60,7 @@ static void display(void){
     glEnd();
 
 
-    for(double z1 = 70;z1<=130;z1+=1){
+    for(double z1 = 50;z1<=90;z1+=1){
         for(int y1 = -240; y1<=239;y1+=1){
             for(int x1 = -320; x1<=319;x1+=1){
                 double A1 = (x1-_x0)*(x1-_x0) + (y1-_y0)*(y1-_y0) + (z1-_z0)*(z1-_z0);
@@ -83,7 +83,7 @@ static void display(void){
                         double Nx=x1-a1,Ny=y1-b1,Nz=z1-c1;
                         double un = sqrt(Nx*Nx+Ny*Ny+Nz*Nz);
                         Nx/=un, Ny/=un,Nz/=un;
-                        color[x1+320][y1+240][0]=50+.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),100));
+                        color[x1+320][y1+240][0]=30+.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),10));
                         //color[x1+320][y1+240][1]=.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),100));
                         //color[x1+320][y1+240][2]=.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),100));
                     }
@@ -95,7 +95,7 @@ static void display(void){
                         double Nx=x1-a2,Ny=y1-b2,Nz=z1-c2;
                         double un = sqrt(Nx*Nx+Ny*Ny+Nz*Nz);
                         Nx/=un, Ny/=un,Nz/=un;
-                        color[x1+320][y1+240][1]=50+.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),100));
+                        color[x1+320][y1+240][1]=30+.5*(max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),10));
                         //color[x1+320][y1+240][0]=.5*(2*max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+3*pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),10));
                         //color[x1+320][y1+240][2]=.5*(2*max(Nx*Lx+Ny*Ly+Nz*Lz,0.0)+3*pow(max(Nx*Hx+Ny*Hy+Nz*Hz,0.0),10));
                     }
